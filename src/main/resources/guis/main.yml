@@ -1,0 +1,13 @@
+title: ""
+slots:
+  - "A########"
+  - "#B#CDEF##"
+  - "GHI###JKL"
+info:
+  A:
+    type: "APPLE"
+    name: "队伍信息"
+    lore:
+      - "{签名}"
+      - "=========="
+    自定义材质标签: 0
