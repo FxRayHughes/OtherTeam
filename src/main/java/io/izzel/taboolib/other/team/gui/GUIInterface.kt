@@ -37,6 +37,10 @@ interface GUIInterface : Helper {
     val size: Int
         get() = slots.size
 
+    fun register() {
+        GUI.menus.add(this)
+    }
+
     companion object : Helper {
         fun getMenuBuilder(player: Player, data: GUIInterface): MenuBuilder {
             return MenuBuilder.builder().also { menu ->

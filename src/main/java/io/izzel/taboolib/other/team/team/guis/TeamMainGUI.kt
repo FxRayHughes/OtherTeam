@@ -1,11 +1,13 @@
 package io.izzel.taboolib.other.team.team.guis
 
+import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.module.tellraw.TellrawJson
 import io.izzel.taboolib.other.team.team.Team
 import io.izzel.taboolib.other.team.team.TeamData
 import io.izzel.taboolib.other.team.utils.Helper
 import io.izzel.taboolib.other.team.utils.Money
 import io.izzel.taboolib.other.team.OtherTeam
+import io.izzel.taboolib.other.team.gui.GUIInterface
 import io.izzel.taboolib.util.Features
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
@@ -19,9 +21,29 @@ import ray.mintcat.wizardfix.Data
 import ray.mintcat.wizardfix.PlayerUtil
 import java.text.DecimalFormat
 
-object TeamMainGUI : Helper {
+object TeamMainGUI : Helper, GUIInterface {
+
+    @TFunction.Init
+    private fun init() {
+        register()
+    }
+
+    override val id: String
+        get() = "main"
+
+    fun openGUINew(player: Player, data: TeamData) {
+        val menu = GUIInterface.getMenuBuilder(player, this)
+        menu.keys
+        menu.click { event ->
+            when (event.slot) {
+
+            }
+        }
+    }
 
     fun openGUI(player: Player, data: TeamData) {
+
+
         val menu = MenuBuilder.builder(OtherTeam.plugin)
         val name = data.name
         val tell = data.tell
@@ -49,7 +71,7 @@ object TeamMainGUI : Helper {
                         .colored()
                         .build()
                 )
-                if (Bukkit.getPluginManager().isPluginEnabled("Other")){
+                if (Bukkit.getPluginManager().isPluginEnabled("Other")) {
                     inv.setItem(18,
                         ItemBuilder(Material.OAK_SIGN)
                             .name("§f队伍聊天频道")
@@ -82,7 +104,10 @@ object TeamMainGUI : Helper {
                 inv.setItem(24,
                     ItemBuilder(Material.CHEST)
                         .name("§f队伍战利品")
-                        .lore(listOf("§7战利品分配模式: $data.itemType", "", "&7队长可以进行分配", "§8左键:§7打开仓库 §f| §8右键:§7切换模式").process())
+                        .lore(listOf("§7战利品分配模式: $data.itemType",
+                            "",
+                            "&7队长可以进行分配",
+                            "§8左键:§7打开仓库 §f| §8右键:§7切换模式").process())
                         .colored()
                         .build()
                 )
@@ -151,7 +176,7 @@ object TeamMainGUI : Helper {
                         Features.inputSign(player, arrayOf("", "§6↑输入 确认 确认操作")) { les ->
                             if (les.isEmpty() || les[0] != "确认") {
                                 player.info("操作取消!")
-                                openGUI(player,data)
+                                openGUI(player, data)
                                 return@inputSign
                             }
                             val target = data.members.firstOrNull { it.teamID == teamID }!!.uuid
@@ -169,7 +194,7 @@ object TeamMainGUI : Helper {
                         Features.inputSign(player, arrayOf("", "§6↑输入 确认 确认操作")) { les ->
                             if (les.isEmpty() || les[0] != "确认") {
                                 player.info("操作取消!")
-                                openGUI(player,data)
+                                openGUI(player, data)
                                 return@inputSign
                             }
                             data.sendMessage("玩家 §f${data.members.firstOrNull { it.teamID == teamID }!!.uuid.toPlayer()!!.name} §7被队长请离了队伍!")
@@ -208,7 +233,7 @@ object TeamMainGUI : Helper {
                             Features.inputSign(player, arrayOf("", "§6↑输入名称")) { les ->
                                 data.name = les[0].screen()
                                 Team.save()
-                                openGUI(player,data)
+                                openGUI(player, data)
                             }
                         }
                         if (event.castClick().isRightClick) {
@@ -229,12 +254,12 @@ object TeamMainGUI : Helper {
                                 }
                                 data.tell = over
                                 Team.save()
-                                openGUI(player,data)
+                                openGUI(player, data)
                             }
                         }
                     }
                     18 -> {
-                        if (!Bukkit.getPluginManager().isPluginEnabled("Other")){
+                        if (!Bukkit.getPluginManager().isPluginEnabled("Other")) {
                             return@event
                         }
                         if (isLeft) {
@@ -269,7 +294,7 @@ object TeamMainGUI : Helper {
                                 }
                                 data.chatRoom = info
                                 Team.save()
-                                openGUI(player,data)
+                                openGUI(player, data)
                             }
                         }
                     }
@@ -287,13 +312,13 @@ object TeamMainGUI : Helper {
                                     les[0].replace("-", "").replace("[^0-9.]".toRegex(), "").toDoubleOrNull() ?: 0.0
                                 if (!Money(player).take(moneys)) {
                                     player.error("你没有那么多金,你目前有 §f${Money(player).now}金")
-                                    openGUI(player,data)
+                                    openGUI(player, data)
                                     return@inputSign
                                 }
                                 data.sendMessage("队员 §f${player.name} &7为团队金库添加了 §f${moneys}金!")
                                 data.money += moneys
                                 Team.save()
-                                openGUI(player,data)
+                                openGUI(player, data)
                             }
                         }
                         if (event.castClick().isRightClick) {
@@ -307,7 +332,7 @@ object TeamMainGUI : Helper {
                                 data.giveMoney(it.uuid, number.toDouble())
                             }
                             data.money = 0.0
-                            openGUI(player,data)
+                            openGUI(player, data)
                         }
                     }
                     24 -> {
@@ -319,7 +344,7 @@ object TeamMainGUI : Helper {
                             player.closeInventory()
                             data.switchItemType()
                             data.sendMessage("队长切换了战利品分配策略,当前为 $data.itemType 状态!".process())
-                            openGUI(player,data)
+                            openGUI(player, data)
                             return@event
                         }
                         player.closeInventory()
@@ -334,7 +359,7 @@ object TeamMainGUI : Helper {
                         player.closeInventory()
                         data.switchPVP()
                         data.sendMessage("队长切换了PVP状态,当前为 $data.pvp 状态!".process())
-                        openGUI(player,data)
+                        openGUI(player, data)
                     }
                     26 -> {
                         data.leaveTeam(player.uniqueId)
