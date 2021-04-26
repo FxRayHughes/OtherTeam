@@ -14,11 +14,11 @@ import java.util.*
 @BaseCommand(name = "team", permission = "team.use")
 class TeamCommand : BaseMainCommand(), Helper {
 
-    @SubCommand(description = "创建队伍")
+    @SubCommand(description = "@command-create")
     var create: BaseSubCommand = object : BaseSubCommand() {
 
         override fun getArguments(): Array<Argument> {
-            return arrayOf(Argument("队伍名称"))
+            return arrayOf(Argument("@command-argument-team-name"))
         }
 
         override fun onCommand(sender: CommandSender, command: Command, s: String, args: Array<String>) {
@@ -40,7 +40,7 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData == null) {
-                player.sendLocale("command-nonteamer-command-execute-error")
+                player.sendLocale("command-team-not-found")
                 return
             }
             teamData.openGUI(player)
@@ -82,8 +82,7 @@ class TeamCommand : BaseMainCommand(), Helper {
     var list: BaseSubCommand = object : BaseSubCommand() {
 
         override fun onCommand(sender: CommandSender, command: Command, s: String, args: Array<String>) {
-            val player = sender as? Player ?: return
-            Team.openListTeam(player)
+            Team.openListTeam(sender as? Player ?: return)
         }
     }
 
@@ -94,16 +93,14 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData == null) {
-                player.sendLocale("command-nonteamer-command-execute-error")
+                player.sendLocale("command-team-not-found")
                 return
             }
-
-            val rollNumber = (0..999).random();
-
+            val num = (0..999).random();
             teamData.getAllMember().forEach { uuid ->
-                val player = Bukkit.getPlayer(uuid.uuid)
-                if (player != null && player.isOnline) {
-                    player.sendLocale("command-team-player-rolled-number", player.name, rollNumber)
+                val p = Bukkit.getPlayer(uuid.uuid)
+                if (p != null && p.isOnline) {
+                    p.sendLocale("command-team-player-rolled-number", p.name, num)
                 }
             }
         }
@@ -119,18 +116,18 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData == null) {
-                player.sendLocale("command-nonteamer-command-execute-error")
+                player.sendLocale("command-team-not-found")
                 return
             }
             val uuid = UUID.fromString(args[0])
             val accepts = Team.itemAccept[uuid]
             if (accepts != player) {
-                player.sendLocale("command-team-item-doesnt-belong-player")
+                player.sendLocale("command-team-item-not-belong-player")
                 return
             }
             val item = teamData.items.firstOrNull { it.id == uuid }
             if (item == null) {
-                player.sendLocale("command-team-item-doesnt-exists")
+                player.sendLocale("command-team-item-not-exists")
                 return
             }
             Money(player).take(item.money)
