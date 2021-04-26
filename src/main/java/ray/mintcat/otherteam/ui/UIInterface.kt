@@ -1,29 +1,26 @@
-package io.izzel.taboolib.other.team.gui
+package ray.mintcat.otherteam.ui
 
 import io.izzel.taboolib.internal.xseries.XMaterial
-import io.izzel.taboolib.module.locale.chatcolor.TColor
-import io.izzel.taboolib.other.team.OtherTeam
-import io.izzel.taboolib.other.team.utils.Helper
 import io.izzel.taboolib.util.item.ItemBuilder
-import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import ray.mintcat.otherteam.OtherTeam
+import ray.mintcat.otherteam.utils.Helper
 import java.io.File
 
-interface GUIInterface : Helper {
+interface UIInterface : Helper {
 
     /**
      * 页面ID
      */
     val id: String
 
-
     val config: YamlConfiguration
-        get() = YamlConfiguration.loadConfiguration(File(OtherTeam.plugin.dataFolder, "guis/${id}.yml"))
+        get() = YamlConfiguration.loadConfiguration(File(OtherTeam.plugin.dataFolder, "ui/${id}.yml"))
 
     /**
      * 页面名称
@@ -38,11 +35,12 @@ interface GUIInterface : Helper {
         get() = slots.size
 
     fun register() {
-        GUI.menus.add(this)
+        UI.menus.add(this)
     }
 
     companion object : Helper {
-        fun getMenuBuilder(player: Player, data: GUIInterface): MenuBuilder {
+
+        fun getMenuBuilder(player: Player, data: UIInterface): MenuBuilder {
             return MenuBuilder.builder().also { menu ->
                 menu.title(data.title)
                 menu.items(*data.slots.toTypedArray())
@@ -52,7 +50,7 @@ interface GUIInterface : Helper {
             }
         }
 
-        fun itemCreate(slot: String, player: Player, data: GUIInterface): ItemStack {
+        fun itemCreate(slot: String, player: Player, data: UIInterface): ItemStack {
             val config = data.config.getConfigurationSection("info.$slot") ?: return ItemStack(Material.AIR)
             return ItemBuilder(XMaterial.valueOf(config.getString("type", "APPLE")!!)).also { itemBuilder ->
                 itemBuilder.amount(config.getInt("amount", 0))

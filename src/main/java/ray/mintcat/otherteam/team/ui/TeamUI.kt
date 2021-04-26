@@ -1,13 +1,7 @@
-package io.izzel.taboolib.other.team.team.guis
+package ray.mintcat.otherteam.team.ui
 
 import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.module.tellraw.TellrawJson
-import io.izzel.taboolib.other.team.team.Team
-import io.izzel.taboolib.other.team.team.TeamData
-import io.izzel.taboolib.other.team.utils.Helper
-import io.izzel.taboolib.other.team.utils.Money
-import io.izzel.taboolib.other.team.OtherTeam
-import io.izzel.taboolib.other.team.gui.GUIInterface
 import io.izzel.taboolib.util.Features
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
@@ -17,11 +11,17 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
+import ray.mintcat.otherteam.OtherTeam
+import ray.mintcat.otherteam.team.Team
+import ray.mintcat.otherteam.team.TeamData
+import ray.mintcat.otherteam.ui.UIInterface
+import ray.mintcat.otherteam.utils.Helper
+import ray.mintcat.otherteam.utils.Money
 import ray.mintcat.wizardfix.Data
 import ray.mintcat.wizardfix.PlayerUtil
 import java.text.DecimalFormat
 
-object TeamMainGUI : Helper, GUIInterface {
+object TeamUI : Helper, UIInterface {
 
     @TFunction.Init
     private fun init() {
@@ -32,7 +32,7 @@ object TeamMainGUI : Helper, GUIInterface {
         get() = "main"
 
     fun openGUINew(player: Player, data: TeamData) {
-        val menu = GUIInterface.getMenuBuilder(player, this)
+        val menu = UIInterface.getMenuBuilder(player, this)
         menu.keys
         menu.click { event ->
             when (event.slot) {
@@ -370,11 +370,8 @@ object TeamMainGUI : Helper, GUIInterface {
                         player.info("你已经成功加入了频道 &f默认频道")
                     }
                 }
-            }
-            .close {
+            }.close {
                 Team.save()
-            }
-            .open(player)
+            }.open(player)
     }
-
 }

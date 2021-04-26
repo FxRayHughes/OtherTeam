@@ -1,8 +1,7 @@
-package io.izzel.taboolib.other.team.utils
+package ray.mintcat.otherteam.utils
 
 import io.izzel.taboolib.TabooLibAPI
 import org.bukkit.OfflinePlayer
-import ray.mintcat.wizardfix.Data
 
 class Money(val player: OfflinePlayer) {
 

@@ -1,16 +1,16 @@
-package io.izzel.taboolib.other.team.team.guis
+package ray.mintcat.otherteam.team.ui
 
-import io.izzel.taboolib.other.team.utils.Helper
-import io.izzel.taboolib.other.team.team.Team
-import io.izzel.taboolib.other.team.OtherTeam
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import ray.mintcat.otherteam.OtherTeam
+import ray.mintcat.otherteam.team.Team
+import ray.mintcat.otherteam.utils.Helper
 import ray.mintcat.wizardfix.PlayerUtil
 
-object TeamListTeamGUI: Helper {
+object TeamListUI: Helper {
 
     fun openListTeam(player: Player): MenuBuilder {
         val menu = MenuBuilder.builder(OtherTeam.plugin)
@@ -44,8 +44,7 @@ object TeamListTeamGUI: Helper {
                 return@event
             }
             val item = event.currentItem ?: return@event
-            val adminName =
-                item.itemMeta?.lore?.firstOrNull { it.contains("§7队长: §f") }?.replace("§7队长: §f", "") ?: return@event
+            val adminName = item.itemMeta?.lore?.firstOrNull { it.contains("§7队长: §f") }?.replace("§7队长: §f", "") ?: return@event
             val adminUUID = PlayerUtil.getOfflinePlayer(adminName)?.uniqueId ?: return@event
             val team = Team.getTeam(adminUUID)
             if (team == null) {

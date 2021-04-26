@@ -1,11 +1,7 @@
-package io.izzel.taboolib.other.team.team
+package ray.mintcat.otherteam.team
 
 import io.izzel.taboolib.cronus.CronusUtils
 import io.izzel.taboolib.module.tellraw.TellrawJson
-import io.izzel.taboolib.other.team.utils.Helper
-import io.izzel.taboolib.other.team.utils.Money
-import io.izzel.taboolib.other.team.OtherTeam
-import io.izzel.taboolib.other.team.team.guis.TeamMainGUI
 import io.izzel.taboolib.util.Features
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
@@ -16,21 +12,24 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import ray.mintcat.otherteam.OtherTeam
+import ray.mintcat.otherteam.team.ui.TeamUI
+import ray.mintcat.otherteam.utils.Helper
+import ray.mintcat.otherteam.utils.Money
 import ray.mintcat.wizardfix.PlayerUtil
 import java.util.*
-import kotlin.collections.ArrayList
 
 class TeamData(
     val admin: UUID,
     var name: String = "",
     var tell: MutableList<String> = mutableListOf(),
     var pvp: Boolean = false,
-    val member: ArrayList<UUID> = arrayListOf(),
+    val member: MutableList<UUID> = arrayListOf(),
     var money: Double = 0.0,
     val items: MutableList<TeamItemsData> = mutableListOf(),
     var itemType: Boolean = false,
     var chatRoom: String = "0",
-    val joinList: ArrayList<UUID> = arrayListOf(),
+    val joinList: MutableList<UUID> = arrayListOf(),
 ) : Helper {
 
     val members = arrayListOf<TeamMemberData>()
@@ -164,7 +163,7 @@ class TeamData(
     }
 
     fun openGUI(player: Player) {
-        TeamMainGUI.openGUI(player,this)
+        TeamUI.openGUI(player,this)
     }
 
     fun openLib(player: Player) {
@@ -242,7 +241,7 @@ class TeamData(
                     }
                 }
                 if (isRight) {
-                    val map = mutableListOf<RollData>()
+                    val map = mutableListOf<Roll>()
                     getAllMember().forEach {
                         TellrawJson.create().append("§8[§c Other §8] §7队长对 §f${Items.getName(item)} §7发起了Roll点分配!")
                             .hoverItem(item)
@@ -257,7 +256,7 @@ class TeamData(
                     list.forEach { target ->
                         val roll = (0..999).random()
                         sendMessage("队员 §f${target.uuid.toPlayer()!!.name} §7对§f ${Items.getName(item)} §7Roll出了 §e$roll§7 点")
-                        map.add(RollData(target.uuid, roll))
+                        map.add(Roll(target.uuid, roll))
                     }
                     map.sortByDescending { it.roll }
                     sendMessage("当前最高点数为§e ${map[0].roll} §7掷出者: §f${map[0].uuid.toPlayer()!!.name}")
@@ -324,10 +323,4 @@ class TeamData(
 
         menu.open(player)
     }
-
-    class RollData(
-        val uuid: UUID,
-        val roll: Int,
-    )
-
 }

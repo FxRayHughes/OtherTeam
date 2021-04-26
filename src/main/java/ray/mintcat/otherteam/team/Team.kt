@@ -1,13 +1,13 @@
-package io.izzel.taboolib.other.team.team
+package ray.mintcat.otherteam.team
 
 import io.izzel.taboolib.module.db.local.LocalFile
 import io.izzel.taboolib.module.inject.TFunction
 import io.izzel.taboolib.module.inject.TSchedule
-import io.izzel.taboolib.other.team.utils.Helper
-import io.izzel.taboolib.other.team.team.guis.TeamListTeamGUI
 import io.izzel.taboolib.util.item.Items
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
+import ray.mintcat.otherteam.team.ui.TeamListUI
+import ray.mintcat.otherteam.utils.Helper
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -26,7 +26,7 @@ object Team : Helper {
     }
 
     fun getTeam(member: UUID): TeamData? {
-        return teams.firstOrNull() { it.isMember(member) }
+        return teams.firstOrNull { it.isMember(member) }
     }
 
     fun create(data: TeamData) {
@@ -36,26 +36,26 @@ object Team : Helper {
     }
 
     fun openListTeam(player: Player) {
-        TeamListTeamGUI.openListTeam(player).open(player)
+        TeamListUI.openListTeam(player).open(player)
     }
 
     @TSchedule
     fun load() {
         teams.clear()
         data.getKeys(false).forEach { key ->
-            val datas = TeamData(UUID.fromString(key),
+            val data = TeamData(
+                UUID.fromString(key),
                 data.getString("${key}.name")!!,
                 data.getStringList("${key}.tell"),
                 data.getBoolean("${key}.pvp"),
-                data.getStringList("${key}.member").map { UUID.fromString(it) }.toArrays(),
+                data.getStringList("${key}.member").map { UUID.fromString(it) }.toMutableList(),
                 data.getDouble("${key}.money"),
-                data.getStringList("${key}.items").map { TeamItemsData.createData(Items.fromJson(it)!!) }
-                    .toMutableList(),
+                data.getStringList("${key}.items").map { TeamItemsData.createData(Items.fromJson(it)!!) }.toMutableList(),
                 data.getBoolean("${key}.itemType"),
                 data.getString("${key}.chatRoom")!!,
-                data.getStringList("${key}.joinList").map { UUID.fromString(it) }.toArrays()
+                data.getStringList("${key}.joinList").map { UUID.fromString(it) }.toMutableList()
             )
-            teams.add(datas)
+            teams.add(data)
             save()
         }
     }
