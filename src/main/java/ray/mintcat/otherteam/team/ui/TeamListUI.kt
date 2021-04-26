@@ -1,5 +1,6 @@
 package ray.mintcat.otherteam.team.ui
 
+import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
@@ -10,7 +11,7 @@ import ray.mintcat.otherteam.team.Team
 import ray.mintcat.otherteam.utils.Helper
 import ray.mintcat.wizardfix.PlayerUtil
 
-object TeamListUI: Helper {
+object TeamListUI : Helper {
 
     fun openListTeam(player: Player): MenuBuilder {
         val menu = MenuBuilder.builder(OtherTeam.plugin)
@@ -40,27 +41,28 @@ object TeamListUI: Helper {
                 return@event
             }
             if (Team.getTeam(player.uniqueId) != null) {
-                player.error("你已经在一个队伍当中了!")
+                player.sendLocale("command-team-already-in")
                 return@event
             }
             val item = event.currentItem ?: return@event
-            val adminName = item.itemMeta?.lore?.firstOrNull { it.contains("§7队长: §f") }?.replace("§7队长: §f", "") ?: return@event
+            val adminName =
+                item.itemMeta?.lore?.firstOrNull { it.contains("§7队长: §f") }?.replace("§7队长: §f", "") ?: return@event
             val adminUUID = PlayerUtil.getOfflinePlayer(adminName)?.uniqueId ?: return@event
             val team = Team.getTeam(adminUUID)
             if (team == null) {
-                player.error("该队伍不存在!")
+                player.sendLocale("command-team-does-not-exists")
                 return@event
             }
             if (team.member.size >= 4) {
-                player.error("该队伍以满员!")
+                player.sendLocale("command-team-size-fulled")
                 return@event
             }
             if (team.joinList.contains(player.uniqueId)) {
-                player.error("您已经申请了该队伍!")
+                player.sendLocale("command-team-player-already-application")
                 return@event
             }
             team.joinList.add(player.uniqueId)
-            team.admin.toPlayer()!!.info("玩家 &f${player.name} &7申请加入队伍!")
+            team.admin.toPlayer()!!.sendLocale("command-team-player-apply-to-join-team", player.name)
         }
         return menu
     }

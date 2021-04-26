@@ -1,6 +1,8 @@
 package ray.mintcat.otherteam.team
 
+import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.module.command.base.*
+import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -23,12 +25,11 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData != null) {
-                player.error("您已经身处一个队伍中了,无法再创建一个队伍,请退当前队伍!")
+                player.sendLocale("command-team-already-in")
                 return
             }
             Team.create(TeamData(player.uniqueId, args[0].screen()))
-            player.info("成功创建了一个队伍(${args[0].screen()}).")
-            player.info("快输入&f /team gui&7 打开队伍面板吧")
+            player.sendLocale("command-team-successfully-created", args[0].screen())
         }
     }
 
@@ -39,7 +40,7 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData == null) {
-                player.error("您不在队伍中无法打开,请加入或创建一个队伍!")
+                player.sendLocale("command-nonteamer-command-execute-error")
                 return
             }
             teamData.openGUI(player)
@@ -53,25 +54,25 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData != null) {
-                player.error("您已经在一个队伍中了!")
+                player.sendLocale("command-team-already-in")
                 return
             }
             val accepts = Data(player).get("TeamAccept", "no")
             if (accepts == "no") {
-                player.error("没有待处理的申请!")
+                player.sendLocale("command-team-no-pending-applications")
                 return
             }
             val team = Team.getTeam(UUID.fromString(accepts))
             if (team == null) {
-                player.error("对方的队伍不存在了!")
+                player.sendLocale("command-team-does-not-exists")
                 return
             }
             if (team.member.size >= 4) {
-                player.error("对方的队伍人数已满")
+                player.sendLocale("command-team-size-fulled")
                 return
             }
             team.addMember(player.uniqueId)
-            team.sendMessage("玩家 §f${player.name} §7加入了队伍!")
+            player.sendLocale("command-team-player-joined-message", player.name)
             Data(player).edit("TeamAccept", "=", "no")
             Team.save()
         }
@@ -93,10 +94,18 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData == null) {
-                player.error("您不在队伍中无法打开,请加入或创建一个队伍!")
+                player.sendLocale("command-nonteamer-command-execute-error")
                 return
             }
-            teamData.sendMessage("队员 §f${player.name}§7 Roll了一次骰子摇出了 §e${(0..999).random()}§8 点")
+
+            val rollNumber = (0..999).random();
+
+            teamData.getAllMember().forEach { uuid ->
+                val player = Bukkit.getPlayer(uuid.uuid)
+                if (player != null && player.isOnline) {
+                    player.sendLocale("command-team-player-rolled-number", player.name, rollNumber)
+                }
+            }
         }
     }
 
@@ -110,18 +119,18 @@ class TeamCommand : BaseMainCommand(), Helper {
             val player = sender as? Player ?: return
             val teamData = Team.getTeam(player.uniqueId)
             if (teamData == null) {
-                player.error("您不在队伍中")
+                player.sendLocale("command-nonteamer-command-execute-error")
                 return
             }
             val uuid = UUID.fromString(args[0])
             val accepts = Team.itemAccept[uuid]
             if (accepts != player) {
-                player.error("该物品不属于你,无法获取!")
+                player.sendLocale("command-team-item-doesnt-belong-player")
                 return
             }
             val item = teamData.items.firstOrNull { it.id == uuid }
             if (item == null) {
-                player.error("物品不存在了!")
+                player.sendLocale("command-team-item-doesnt-exists")
                 return
             }
             Money(player).take(item.money)

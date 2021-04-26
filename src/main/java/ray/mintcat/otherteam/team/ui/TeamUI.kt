@@ -1,6 +1,8 @@
 package ray.mintcat.otherteam.team.ui
 
+import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.module.inject.TFunction
+import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
 import io.izzel.taboolib.util.Features
 import io.izzel.taboolib.util.item.ItemBuilder
@@ -42,8 +44,6 @@ object TeamUI : Helper, UIInterface {
     }
 
     fun openGUI(player: Player, data: TeamData) {
-
-
         val menu = MenuBuilder.builder(OtherTeam.plugin)
         val name = data.name
         val tell = data.tell
@@ -57,14 +57,16 @@ object TeamUI : Helper, UIInterface {
                 loreTell.addAll(tell.map { " §7- §f$it" })
                 loreTell.add(" ")
                 loreTell.add("§8左键:§7编辑名称 §f| §8右键:§7编辑宣言")
-                inv.setItem(0,
+                inv.setItem(
+                    0,
                     ItemBuilder(Material.NAME_TAG)
                         .name("§f团队设置")
                         .lore(loreTell)
                         .colored()
                         .build()
                 )
-                inv.setItem(10,
+                inv.setItem(
+                    10,
                     ItemBuilder(data.getFlag(0))
                         .name("&7队长:§f ${Bukkit.getOfflinePlayer(admin).name}")
                         .lore("§7当前状态: ${data.isOnlineInfo(Bukkit.getOfflinePlayer(admin))}", "", "§7成员ID: §f0")
@@ -72,42 +74,58 @@ object TeamUI : Helper, UIInterface {
                         .build()
                 )
                 if (Bukkit.getPluginManager().isPluginEnabled("Other")) {
-                    inv.setItem(18,
+                    inv.setItem(
+                        18,
                         ItemBuilder(Material.OAK_SIGN)
                             .name("§f队伍聊天频道")
-                            .lore(listOf("§7当前聊天频道: §f$data.chatRoom",
-                                "",
-                                "&7队长可以进行更改",
-                                "§8左键:§7加入聊天频道 §f| §8右键:§7切换聊天频道",
-                                "§8下蹲+右键:§7强制所有成员加入队伍频道").process())
+                            .lore(
+                                listOf(
+                                    "§7当前聊天频道: §f$data.chatRoom",
+                                    "",
+                                    "&7队长可以进行更改",
+                                    "§8左键:§7加入聊天频道 §f| §8右键:§7切换聊天频道",
+                                    "§8下蹲+右键:§7强制所有成员加入队伍频道"
+                                ).process()
+                            )
                             .colored()
                             .build()
                     )
                 }
-                inv.setItem(19,
+                inv.setItem(
+                    19,
                     ItemBuilder(Material.TRIPWIRE_HOOK)
                         .name("§f入队申请")
-                        .lore(listOf("§7当前等候区人数: §f${data.joinList.size}",
-                            "",
-                            "&7队长可以进行通过",
-                            "§8点击:§7打开审核列表").process())
+                        .lore(
+                            listOf(
+                                "§7当前等候区人数: §f${data.joinList.size}",
+                                "",
+                                "&7队长可以进行通过",
+                                "§8点击:§7打开审核列表"
+                            ).process()
+                        )
                         .colored()
                         .build()
                 )
-                inv.setItem(23,
+                inv.setItem(
+                    23,
                     ItemBuilder(Material.GOLD_INGOT)
                         .name("§f队伍金库")
                         .lore(listOf("§7当前金库: §f${data.money}金", "", "§8队长可以进行分配", "§8左键:§7添加货币 §f| §8右键:§7均分给成员"))
                         .colored()
                         .build()
                 )
-                inv.setItem(24,
+                inv.setItem(
+                    24,
                     ItemBuilder(Material.CHEST)
                         .name("§f队伍战利品")
-                        .lore(listOf("§7战利品分配模式: $data.itemType",
-                            "",
-                            "&7队长可以进行分配",
-                            "§8左键:§7打开仓库 §f| §8右键:§7切换模式").process())
+                        .lore(
+                            listOf(
+                                "§7战利品分配模式: $data.itemType",
+                                "",
+                                "&7队长可以进行分配",
+                                "§8左键:§7打开仓库 §f| §8右键:§7切换模式"
+                            ).process()
+                        )
                         .colored()
                         .build()
                 )
@@ -119,10 +137,12 @@ object TeamUI : Helper, UIInterface {
                 if (data.pvp) {
                     itemPVP.enchant(Enchantment.LUCK, 10)
                 }
-                inv.setItem(25,
+                inv.setItem(
+                    25,
                     itemPVP.build()
                 )
-                inv.setItem(26,
+                inv.setItem(
+                    26,
                     ItemBuilder(Material.IRON_BOOTS)
                         .name("§f离开队伍")
                         .lore(listOf("&c点击离开队伍"))
@@ -135,7 +155,8 @@ object TeamUI : Helper, UIInterface {
                 for (i in data.members) {
                     val players = Bukkit.getOfflinePlayer(i.uuid)
                     if (PlayerUtil.getOfflinePlayerList().contains(player)) {
-                        inv.setItem(12 + a,
+                        inv.setItem(
+                            12 + a,
                             ItemBuilder(data.getFlag(i.teamID))
                                 .name("&7成员:§f ${players.name}")
                                 .lore(
@@ -151,7 +172,8 @@ object TeamUI : Helper, UIInterface {
                     a += 1
                 }
                 if (data.member.size < 4) {
-                    inv.setItem(12 + data.member.size,
+                    inv.setItem(
+                        12 + data.member.size,
                         ItemBuilder(Material.MAP)
                             .name("  ")
                             .lore("&7+ 点击邀请玩家", "")
@@ -170,12 +192,12 @@ object TeamUI : Helper, UIInterface {
                         .split(": §f")[1].toInt()
                     if (isLeft && isShift) {
                         if (!data.isAdmin(player)) {
-                            player.error("你不是队长,无法进行操作!")
+                            player.sendLocale("command-team-player-execute-error")
                             return@event
                         }
                         Features.inputSign(player, arrayOf("", "§6↑输入 确认 确认操作")) { les ->
                             if (les.isEmpty() || les[0] != "确认") {
-                                player.info("操作取消!")
+                                player.sendLocale("command-team-player-operation-canceled")
                                 openGUI(player, data)
                                 return@inputSign
                             }
@@ -188,12 +210,12 @@ object TeamUI : Helper, UIInterface {
                     }
                     if (isRight && isShift) {
                         if (!data.isAdmin(player)) {
-                            player.error("你不是队长,无法进行操作!")
+                            player.sendLocale("command-team-player-execute-error")
                             return@event
                         }
                         Features.inputSign(player, arrayOf("", "§6↑输入 确认 确认操作")) { les ->
                             if (les.isEmpty() || les[0] != "确认") {
-                                player.info("操作取消!")
+                                player.sendLocale("command-team-player-operation-canceled")
                                 openGUI(player, data)
                                 return@inputSign
                             }
@@ -210,13 +232,13 @@ object TeamUI : Helper, UIInterface {
                     Features.inputSign(player, arrayOf("", "§6↑输入名称")) { les ->
                         val players = les[0].toPlayer()
                         if (players == null) {
-                            player.error("玩家 [§f${les[0]}&7] 不存在或不在线请查询后再添加!")
+                            player.sendLocale("command-team-player-not-online")
                             return@inputSign
                         }
-                        player.info("邀请发送成功! 等待对方回应...")
+                        player.sendLocale("command-team-invitation-sent-successfully")
                         Data(players).edit("TeamAccept", "=", admin.toString())
-                        players.info("您收到了一个来自${player.name}的队伍邀请:")
-                        TellrawJson.create().append("§8[§c Other §8] §7点击接受 §a[接受]")
+                        player.sendLocale("command-team-player-got-invitation")
+                        TellrawJson.create().append(TLocale.asString("command-team-player-clicked-to-accept"))
                             .hoverText("接受请求 [来自${admin.toPlayer()?.name}]")
                             .clickCommand("/team accept")
                             .send(players)
@@ -226,7 +248,7 @@ object TeamUI : Helper, UIInterface {
                 when (event.rawSlot) {
                     0 -> {
                         if (!data.isAdmin(player)) {
-                            player.error("你不是队长,无法进行操作!")
+                            player.sendLocale("command-team-player-execute-error")
                             return@event
                         }
                         if (event.castClick().isLeftClick) {
@@ -264,15 +286,15 @@ object TeamUI : Helper, UIInterface {
                         }
                         if (isLeft) {
                             Data(player).edit("chat-room", "=", data.chatRoom)
-                            player.info("您已加入队伍聊天频道")
+                            player.sendLocale("command-team-player-joined-team-chat-channel")
                             return@event
                         }
                         if (isShift && isRight) {
                             if (!data.isAdmin(player)) {
-                                player.error("你不是队长,无法进行操作!")
+                                player.sendLocale("command-team-player-execute-error")
                                 return@event
                             }
-                            data.sendMessage("队长强制队员加入了队伍聊天频道 &f$data.chatRoom &7请听队长指挥!")
+                            data.sendMessage("command-team-leader-forced-teamers-join-chat-channel", data.chatRoom)
                             data.getAllMember().forEach { players ->
                                 Data(players.uuid.toPlayer()!!).edit("chat-room", "=", data.chatRoom)
                             }
@@ -280,14 +302,14 @@ object TeamUI : Helper, UIInterface {
                         }
                         if (isRight) {
                             if (!data.isAdmin(player)) {
-                                player.error("你不是队长,无法进行操作!")
+                                player.sendLocale("command-team-player-execute-error")
                                 return@event
                             }
                             Features.inputSign(player, arrayOf("", "§6↑设置频道")) { les ->
                                 val info = les[0].screen()
                                 data.getAllMember().forEach { players ->
                                     TellrawJson.create()
-                                        .append("§8[§c Other §8] §7队长设置了新的队伍频道 §f$info §7请队员们重新加入!  §a[点击快速加入]")
+                                        .append(TLocale.asString("command-team-leader-setted-the-new-chat-channel"))
                                         .hoverText("§7新的频道: §f$info")
                                         .clickCommand("/other tjoin $info")
                                         .send(players.uuid.toPlayer()!!)
@@ -300,7 +322,7 @@ object TeamUI : Helper, UIInterface {
                     }
                     19 -> {
                         if (!data.isAdmin(player)) {
-                            player.error("你不是队长,无法进行操作!")
+                            player.sendLocale("command-team-player-execute-error")
                             return@event
                         }
                         data.openJoinGUI(player)
@@ -311,11 +333,11 @@ object TeamUI : Helper, UIInterface {
                                 val moneys =
                                     les[0].replace("-", "").replace("[^0-9.]".toRegex(), "").toDoubleOrNull() ?: 0.0
                                 if (!Money(player).take(moneys)) {
-                                    player.error("你没有那么多金,你目前有 §f${Money(player).now}金")
+                                    player.sendLocale("command-team-player-dont-have-enough-money")
                                     openGUI(player, data)
                                     return@inputSign
                                 }
-                                data.sendMessage("队员 §f${player.name} &7为团队金库添加了 §f${moneys}金!")
+                                data.sendMessage("command-team-player-added-money-to-the-team", player.name, moneys)
                                 data.money += moneys
                                 Team.save()
                                 openGUI(player, data)
@@ -323,7 +345,7 @@ object TeamUI : Helper, UIInterface {
                         }
                         if (event.castClick().isRightClick) {
                             if (!data.isAdmin(player)) {
-                                player.error("你不是队长,无法进行操作!")
+                                player.sendLocale("command-team-player-execute-error")
                                 return@event
                             }
                             val df = DecimalFormat("#.00")
@@ -338,12 +360,22 @@ object TeamUI : Helper, UIInterface {
                     24 -> {
                         if (event.castClick().isRightClick) {
                             if (!data.isAdmin(player)) {
-                                player.error("你不是队长,无法进行操作!")
+                                player.sendLocale("command-team-player-execute-error")
                                 return@event
                             }
                             player.closeInventory()
                             data.switchItemType()
-                            data.sendMessage("队长切换了战利品分配策略,当前为 $data.itemType 状态!".process())
+                            var string = TLocale.asString(
+                                "command-team-leader-switched-the-trophy-allocation-strategy",
+                                data.itemType
+                            )
+                            string = string.process()
+                            data.getAllMember().forEach { uuid ->
+                                val playerMember = Bukkit.getPlayer(uuid.uuid)
+                                if (playerMember != null && playerMember.isOnline) {
+                                    playerMember.sendMessage(string)
+                                }
+                            }
                             openGUI(player, data)
                             return@event
                         }
@@ -353,21 +385,31 @@ object TeamUI : Helper, UIInterface {
                     }
                     25 -> {
                         if (!data.isAdmin(player)) {
-                            player.error("你不是队长,无法进行操作!")
+                            player.sendLocale("command-team-player-execute-error")
                             return@event
                         }
                         player.closeInventory()
                         data.switchPVP()
-                        data.sendMessage("队长切换了PVP状态,当前为 $data.pvp 状态!".process())
+                        var string = TLocale.asString(
+                            "command-team-leader-switched-the-pvp-mode",
+                            data.pvp
+                        )
+                        string = string.process()
+                        data.getAllMember().forEach { uuid ->
+                            val playerMember = Bukkit.getPlayer(uuid.uuid)
+                            if (playerMember != null && playerMember.isOnline) {
+                                playerMember.sendMessage(string)
+                            }
+                        }
                         openGUI(player, data)
                     }
                     26 -> {
                         data.leaveTeam(player.uniqueId)
-                        data.sendMessage("玩家 &f${player.name}&7 离开了队伍")
+                        data.sendMessage("command-team-player-left-message-to-all", player.name)
                         player.closeInventory()
                         Data(player).edit("chat-room", "=", "0")
-                        player.info("你离开了队伍 §f$name")
-                        player.info("你已经成功加入了频道 &f默认频道")
+                        player.sendLocale("command-team-player-left-message-to-single")
+                        player.sendLocale("command-team-player-auto-switching-channel-to-default")
                     }
                 }
             }.close {
