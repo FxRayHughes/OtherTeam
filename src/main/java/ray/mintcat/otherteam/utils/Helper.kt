@@ -1,10 +1,9 @@
-package io.izzel.taboolib.other.team.utils
+package ray.mintcat.otherteam.utils
 
 import io.izzel.taboolib.TabooLibAPI
 import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.module.inject.TInject
 import io.izzel.taboolib.module.locale.chatcolor.TColor
-import io.izzel.taboolib.other.team.OtherTeam
 import io.izzel.taboolib.util.Coerce
 import io.izzel.taboolib.util.lite.cooldown.Cooldown
 import org.bukkit.Bukkit
@@ -13,6 +12,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import ray.mintcat.otherteam.OtherTeam
 import java.util.*
 
 /**
@@ -24,13 +24,6 @@ interface Helper {
     fun String.toPlayer(): Player? {
         return player(this)
     }
-
-    fun List<UUID>.toArrays(): ArrayList<UUID> {
-        val list = arrayListOf<UUID>()
-        this.map { list.add(it) }
-        return list
-    }
-
 
     fun Entity.getCName(): String {
         if (this is Player) {
@@ -58,16 +51,12 @@ interface Helper {
         return Coerce.format(this)
     }
 
-
     fun String.screen(): String {
         return this.replace("[^A-Za-z0-9\\u4e00-\\u9fa5_]".toRegex(), "")
     }
 
     fun String.process(): String {
-        return TColor.translate(this)
-            .replace("true", "§a开启§7")
-            .replace("false", "§c关闭§7")
-            .replace("null", "空")
+        return TColor.translate(this).replace("true", "§a开启§7").replace("false", "§c关闭§7").replace("null", "空")
     }
 
     fun List<String>.process(): List<String> {

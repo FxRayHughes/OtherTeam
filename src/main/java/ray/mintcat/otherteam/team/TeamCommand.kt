@@ -1,11 +1,11 @@
-package io.izzel.taboolib.other.team.team
+package ray.mintcat.otherteam.team
 
 import io.izzel.taboolib.module.command.base.*
-import io.izzel.taboolib.other.team.utils.Helper
-import io.izzel.taboolib.other.team.utils.Money
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import ray.mintcat.otherteam.utils.Helper
+import ray.mintcat.otherteam.utils.Money
 import ray.mintcat.wizardfix.Data
 import java.util.*
 
@@ -14,6 +14,7 @@ class TeamCommand : BaseMainCommand(), Helper {
 
     @SubCommand(description = "创建队伍")
     var create: BaseSubCommand = object : BaseSubCommand() {
+
         override fun getArguments(): Array<Argument> {
             return arrayOf(Argument("队伍名称"))
         }

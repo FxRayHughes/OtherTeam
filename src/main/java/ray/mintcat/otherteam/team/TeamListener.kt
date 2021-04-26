@@ -1,30 +1,30 @@
-package io.izzel.taboolib.other.team.team
+package ray.mintcat.otherteam.team
 
 import io.izzel.taboolib.module.inject.TListener
-import io.izzel.taboolib.other.team.utils.Helper
+import io.izzel.taboolib.util.lite.Servers
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
+import ray.mintcat.otherteam.utils.Helper
 
 @TListener
 class TeamListener : Listener, Helper {
 
     @EventHandler
-    fun onEntityDamageEntity(event: EntityDamageByEntityEvent) {
+    fun e(event: EntityDamageByEntityEvent) {
         if (Team.isEnable()) {
-            val damagerTeam = Team.getTeam(event.damager.uniqueId) ?: return
+            val attacker = Servers.getAttackerInDamageEvent(event) ?: return
+            val attackerTeam = Team.getTeam(attacker.uniqueId) ?: return
             val entityTeam = Team.getTeam(event.entity.uniqueId) ?: return
-            if (damagerTeam == entityTeam) {
-                if (!damagerTeam.pvp) {
-                    event.isCancelled = true
-                }
+            if (attackerTeam == entityTeam && !attackerTeam.pvp) {
+                event.isCancelled = true
             }
         }
     }
 
     @EventHandler
-    fun onPickItem(event: EntityPickupItemEvent) {
+    fun e(event: EntityPickupItemEvent) {
         val team = Team.getTeam(event.entity.uniqueId) ?: return
         if (!team.itemType) {
             return
