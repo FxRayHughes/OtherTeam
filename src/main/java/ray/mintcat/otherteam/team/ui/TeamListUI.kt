@@ -1,5 +1,6 @@
 package ray.mintcat.otherteam.team.ui
 
+import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.util.item.ItemBuilder
 import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.item.inventory.MenuBuilder
@@ -48,11 +49,11 @@ object TeamListUI: Helper {
             val adminUUID = PlayerUtil.getOfflinePlayer(adminName)?.uniqueId ?: return@event
             val team = Team.getTeam(adminUUID)
             if (team == null) {
-                player.error("该队伍不存在!")
+                player.sendLocale("command-team-not-found")
                 return@event
             }
             if (team.member.size >= 4) {
-                player.error("该队伍以满员!")
+                player.sendLocale("command-team-is-full")
                 return@event
             }
             if (team.joinList.contains(player.uniqueId)) {
