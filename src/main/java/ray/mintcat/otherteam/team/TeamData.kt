@@ -1,6 +1,8 @@
 package ray.mintcat.otherteam.team
 
 import io.izzel.taboolib.cronus.CronusUtils
+import io.izzel.taboolib.kotlin.sendLocale
+import io.izzel.taboolib.module.locale.TLocale
 import io.izzel.taboolib.module.tellraw.TellrawJson
 import io.izzel.taboolib.util.Features
 import io.izzel.taboolib.util.item.ItemBuilder
@@ -66,6 +68,24 @@ class TeamData(
         return getAllMember().map { it.uuid }.contains(uuid)
     }
 
+    fun sendMessage(string: String) {
+        getAllMember().forEach { uuid ->
+            val player = Bukkit.getPlayer(uuid.uuid)
+            if (player != null && player.isOnline) {
+                player.sendLocale(string)
+            }
+        }
+    }
+
+    fun sendMessage(string: String, vararg args: Any) {
+        getAllMember().forEach { uuid ->
+            val player = Bukkit.getPlayer(uuid.uuid)
+            if (player != null && player.isOnline) {
+                player.sendLocale(string, args)
+            }
+        }
+    }
+
     fun getFlag(int: Int): ItemStack {
         return when (int) {
             0 -> ItemStack(Material.RED_BANNER)
@@ -115,7 +135,7 @@ class TeamData(
 
     fun giveMoney(uuid: UUID, value: Double) {
         Money(uuid.toPlayer()!!).give(value)
-        uuid.toPlayer()!!.info("获得了分配的 §f$value &7金")
+        uuid.toPlayer()!!.sendLocale("command-team-player-got-allocation-money", value)
     }
 
     fun giveItem(itemStack: ItemStack, player: UUID) {
@@ -124,8 +144,15 @@ class TeamData(
             val players = Bukkit.getPlayer(uuid.uuid)
             if (players != null && players.isOnline) {
                 players.playSound(players.location, Sound.UI_BUTTON_CLICK, 1f, (1..2).random().toFloat())
+
+                val jsonString = TLocale.asString(
+                    "command-team-player-got-trophy",
+                    player.toPlayer()!!.name,
+                    Items.getName(itemStack)
+                )
+
                 TellrawJson.create()
-                    .append("§8[§c Other §8] §7队员 §f${player.toPlayer()!!.name} §7获得了战利品 §8[§f${Items.getName(itemStack)}§8]")
+                    .append(jsonString)
                     .hoverItem(itemStack)
                     .send(players)
             }
@@ -138,21 +165,18 @@ class TeamData(
             val players = Bukkit.getPlayer(uuid.uuid)
             if (players != null && players.isOnline) {
                 players.playSound(players.location, Sound.UI_BUTTON_CLICK, 1f, (1..2).random().toFloat())
+
+                val jsonString = TLocale.asString(
+                    "command-team-player-got-trophy-by-money",
+                    player.toPlayer()!!.name,
+                    money,
+                    Items.getName(itemStack)
+                )
+
                 TellrawJson.create()
-                    .append("§8[§c Other §8] §7队员 §f${player.toPlayer()!!.name} §7以 §f${money}金的价格 §7获得了战利品 §8[§f${
-                        Items.getName(itemStack)
-                    }§8]")
+                    .append(jsonString)
                     .hoverItem(itemStack)
                     .send(players)
-            }
-        }
-    }
-
-    fun sendMessage(info: String) {
-        getAllMember().forEach { uuid ->
-            val player = Bukkit.getPlayer(uuid.uuid)
-            if (player != null && player.isOnline) {
-                player.info(info)
             }
         }
     }
@@ -163,7 +187,7 @@ class TeamData(
     }
 
     fun openGUI(player: Player) {
-        TeamUI.openGUI(player,this)
+        TeamUI.openGUI(player, this)
     }
 
     fun openLib(player: Player) {
@@ -171,7 +195,8 @@ class TeamData(
         menu.title("§8[§f $name §8] &0战利品面板".process())
             .rows(6)
             .build { inv ->
-                inv.setItem(0,
+                inv.setItem(
+                    0,
                     ItemBuilder(Material.CAMPFIRE)
                         .name("  ")
                         .lore("§7<- 点击返回队伍面板", "")
@@ -179,10 +204,14 @@ class TeamData(
                         .build()
                 )
                 items.forEach { item ->
-                    inv.addItem(ItemBuilder(item.item).lore("",
-                        "§fTeamItemID: ${item.id}",
-                        "§8左键:§7金币分配物品§f | §8右键:§7Roll点分配物品")
-                        .colored().build())
+                    inv.addItem(
+                        ItemBuilder(item.item).lore(
+                            "",
+                            "§fTeamItemID: ${item.id}",
+                            "§8左键:§7金币分配物品§f | §8右键:§7Roll点分配物品"
+                        )
+                            .colored().build()
+                    )
                 }
             }
             .event { event ->
@@ -198,7 +227,7 @@ class TeamData(
                     return@event
                 }
                 if (!isAdmin(player)) {
-                    player.error("你不是队长,无法进行操作!")
+                    player.sendLocale("command-team-player-not-the-leader")
                     return@event
                 }
                 var id = ""
@@ -220,21 +249,27 @@ class TeamData(
                             if (players.isOnline) {
                                 if (Money(players).has(value)) {
                                     //询问
-                                    players.info("队长给你以 &f$value §7金的价格分配了 §f${item.amount} §7个 §f${Items.getName(item)}")
-                                    TellrawJson.create().append("§8[§c Other §8] §7点击接受 §a[接受]")
+                                    players.sendLocale(
+                                        "command-team-player-be-asked-by-leader-for-trophy",
+                                        value,
+                                        item.amount,
+                                        Items.getName(item)
+                                    )
+
+                                    TellrawJson.create().append(TLocale.asString("command-team-player-clicked-to-accept"))
                                         .hoverItem(item)
                                         .clickCommand("/team item ${itemData?.id.toString()}")
                                         .send(players)
                                     Team.itemAccept[itemData!!.id] = players
 
                                 } else {
-                                    player.error("目标的余额不足!")
+                                    player.sendLocale("command-team-player-balance-not-enough")
                                     openLib(player)
                                 }
                                 Team.save()
                                 openLib(player)
                             } else {
-                                player.error("该玩家不在线!")
+                                player.sendLocale("command-team-player-not-online")
                             }
 
                         }
@@ -274,7 +309,8 @@ class TeamData(
         menu.rows(6)
         menu.title("队伍申请列表")
         menu.build { inv ->
-            inv.setItem(0,
+            inv.setItem(
+                0,
                 ItemBuilder(Material.CAMPFIRE)
                     .name("  ")
                     .lore("§7<- 点击返回队伍面板", "")
@@ -303,19 +339,20 @@ class TeamData(
             val name = Items.getName(event.currentItem).replace("§7申请者: §f", "")
             val target = PlayerUtil.getOfflinePlayer(name)
             if (target == null) {
-                player.error("对方不在线!")
+                player.sendLocale("command-team-player-not-online")
                 return@event
             }
             if (Team.getTeam(target.uniqueId) != null) {
-                player.error("对方已经拥有一个队伍了!")
+                player.sendLocale("command-team-targeted-player-already-in")
                 return@event
             }
             if (member.size >= 4) {
-                player.error("队伍已满员!")
+                player.sendLocale("command-team-size-fulled")
                 return@event
             }
             addMember(target.uniqueId)
-            sendMessage("玩家 &f${target.name} §7已经成功加入了队伍!")
+
+            target.name?.let { sendMessage("command-team-player-joined-message", it) }
             joinList.remove(target.uniqueId)
             Team.save()
             openJoinGUI(player)

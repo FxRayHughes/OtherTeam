@@ -63,18 +63,6 @@ interface Helper {
         return this.map { it.process() }
     }
 
-    fun CommandSender.done(message: String) {
-        toDone(this, message)
-    }
-
-    fun CommandSender.info(message: String) {
-        toInfo(this, message)
-    }
-
-    fun CommandSender.error(message: String) {
-        toError(this, message)
-    }
-
     fun heal(player: Player) {
         player.health = player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value ?: 20.0
         player.foodLevel = 20
@@ -84,27 +72,6 @@ interface Helper {
 
     fun player(name: String): Player? {
         return Bukkit.getPlayerExact(name)
-    }
-
-    fun toInfo(sender: CommandSender, message: String) {
-        sender.sendMessage("§8[§c Other §8] §7${message.replace("&", "§")}")
-        if (sender is Player && !cooldown.isCooldown(sender.name)) {
-            sender.playSound(sender.location, Sound.UI_BUTTON_CLICK, 1f, (1..2).random().toFloat())
-        }
-    }
-
-    fun toError(sender: CommandSender, message: String) {
-        sender.sendMessage("§8[§c Other §8] §7${message.replace("&", "§")}")
-        if (sender is Player && !cooldown.isCooldown(sender.name)) {
-            sender.playSound(sender.location, Sound.ENTITY_VILLAGER_NO, 1f, (1..2).random().toFloat())
-        }
-    }
-
-    fun toDone(sender: CommandSender, message: String) {
-        sender.sendMessage("§8[§c Other §8] §7${message.replace("&", "§")}")
-        if (sender is Player && !cooldown.isCooldown(sender.name)) {
-            sender.playSound(sender.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, (1..2).random().toFloat())
-        }
     }
 
     fun toConsole(message: String) {
