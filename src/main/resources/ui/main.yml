@@ -3,10 +3,22 @@ slots:
   - "A########"
   - "#B#CDEF##"
   - "GHI###JKL"
+format:
+  tell: " §7- §f{info}"
 info:
   A:
     type: "APPLE"
-    name: "队伍信息"
+    name: "§f团队设置"
     lore:
-      - "{签名}"
-      - "=========="
+      - "&7队伍名称:§f $name"
+      - "&7队伍宣言:"
+      - "{tell}"
+      - ""
+      - "§8左键:§7编辑名称 §f| §8右键:§7编辑宣言"
+  L:
+    type: "IRON_BOOTS"
+    name: "&f离开队伍"
+    lore:
+      - "&c点击离开队伍"
+    flag:
+      - HIDE_ATTRIBUTES

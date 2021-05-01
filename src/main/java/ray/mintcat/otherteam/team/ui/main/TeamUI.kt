@@ -1,4 +1,4 @@
-package ray.mintcat.otherteam.team.ui
+package ray.mintcat.otherteam.team.ui.main
 
 import io.izzel.taboolib.kotlin.sendLocale
 import io.izzel.taboolib.module.inject.TFunction
@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemFlag
 import ray.mintcat.otherteam.OtherTeam
 import ray.mintcat.otherteam.team.Team
 import ray.mintcat.otherteam.team.TeamData
+import ray.mintcat.otherteam.ui.UI
 import ray.mintcat.otherteam.ui.UIInterface
 import ray.mintcat.otherteam.utils.Helper
 import ray.mintcat.otherteam.utils.Money
@@ -34,14 +35,13 @@ object TeamUI : Helper, UIInterface {
         get() = "main"
 
     fun openGUINew(player: Player, data: TeamData) {
-        val menu = UIInterface.getMenuBuilder(player, this)
+        val menu = getMenuBuilder(player)
         menu.keys
         menu.click { event ->
-            when (event.slot) {
-
-            }
+            UI.actions.firstOrNull { it.ui == id && it.key == event.slot.toString() }?.run(player, data)
         }
     }
+
 
     fun openGUI(player: Player, data: TeamData) {
         val menu = MenuBuilder.builder(OtherTeam.plugin)

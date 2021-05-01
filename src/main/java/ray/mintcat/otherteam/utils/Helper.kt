@@ -5,6 +5,8 @@ import io.izzel.taboolib.module.i18n.I18n
 import io.izzel.taboolib.module.inject.TInject
 import io.izzel.taboolib.module.locale.chatcolor.TColor
 import io.izzel.taboolib.util.Coerce
+import io.izzel.taboolib.util.item.ItemBuilder
+import io.izzel.taboolib.util.item.Items
 import io.izzel.taboolib.util.lite.cooldown.Cooldown
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -12,6 +14,7 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import ray.mintcat.otherteam.OtherTeam
 import java.util.*
 
@@ -23,6 +26,25 @@ interface Helper {
 
     fun String.toPlayer(): Player? {
         return player(this)
+    }
+
+    fun ItemStack.replace(oldLore: String, newLore: List<String>): ItemStack {
+        if (!Items.hasLore(this, oldLore)) {
+            return this
+        }
+        val lore = this.itemMeta?.lore ?: return this
+        val new = mutableListOf<String>()
+        for (s in lore) {
+            if (s != oldLore) {
+                new.add(s)
+                break
+            }
+            new.addAll(newLore)
+        }
+        val item = ItemBuilder(this)
+        item.lore(new)
+        item.colored()
+        return item.build()
     }
 
     fun Entity.getCName(): String {

@@ -15,7 +15,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import ray.mintcat.otherteam.OtherTeam
-import ray.mintcat.otherteam.team.ui.TeamUI
+import ray.mintcat.otherteam.team.ui.main.TeamUI
 import ray.mintcat.otherteam.utils.Helper
 import ray.mintcat.otherteam.utils.Money
 import ray.mintcat.wizardfix.PlayerUtil
